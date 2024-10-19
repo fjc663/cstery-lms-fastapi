@@ -1,5 +1,5 @@
 from fastapi import status
-from tortoise.exceptions import DoesNotExist
+from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from app.common.enums import RoleEnum
 from app.models.baseModels.userBaseModel import UserModel, LoginModel, RegisterModel
@@ -11,9 +11,10 @@ from app.common.exceptions import UserException
 
 
 # 用户登录
-async def login(login_model: LoginModel):
+async def login(login_model: LoginModel, role: RoleEnum):
     """
     用户登录
+    :param role: 登录的用户角色
     :param login_model: 登录表单
     :return: JWT令牌
     """
@@ -23,6 +24,15 @@ async def login(login_model: LoginModel):
     except DoesNotExist:
         # 如果用户不存在，抛出 404 错误
         raise UserException(status_code=status.HTTP_404_NOT_FOUND, detail="用户不存在")
+
+    # 判断用户角色是否在对应系统登陆(学生、教师、管理)
+    if user.role != role:
+        raise UserException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="请到{}端登录".format(
+                                '学生' if user.role == RoleEnum.STUDENT else
+                                '教师' if user.role == RoleEnum.TEACHER else
+                                '管理'
+                            ))
 
     # 验证密码
     if not verify_password(login_model.password, user.password):
@@ -80,8 +90,21 @@ async def get_user_info(current_user_id: int):
 async def update(user_model: UserModel, user_id: int):
     user = user_model.model_dump(exclude_none=True)
 
-    # 更新
-    await User.filter(id=user_id).update(**user)
+    try:
+        # 尝试更新用户信息
+        updated_count = await User.filter(id=user_id).update(**user)
+
+        if updated_count == 0:
+            # 如果没有找到用户，返回 404
+            raise UserException(status_code=status.HTTP_404_NOT_FOUND, detail="用户不存在")
+
+    except IntegrityError as e:
+        # 捕获唯一约束异常
+        if "Duplicate entry" in str(e):
+            raise UserException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已存在")
+        else:
+            # 处理其他 IntegrityError 错误
+            raise UserException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="数据库错误")
 
 # # 分页查询用户信息
 # async def get_user_page(page_query: UserPageQueryModel):

@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
 from starlette.responses import JSONResponse
 from tortoise.contrib.fastapi import register_tortoise
-from apis.teacher import user_api
+from apis import teacher_user_api, student_user_api
 from app.settings import TORTOISE_ORM
 from app.common.result import Result
 from app.common.middlewares import AuthMiddleware, get_token_header
@@ -33,7 +33,8 @@ async def other_exception_handler(_, __):
 async def service_exception_handler(_, ex: HTTPException):
     return JSONResponse(status_code=ex.status_code, content=Result.error(msg=ex.detail).dict())
 
-app.include_router(user_api, prefix='/teacher/user', tags=["教师端用户相关接口"])
+app.include_router(teacher_user_api, prefix='/teacher/user', tags=["教师端用户相关接口"])
+app.include_router(student_user_api, prefix='/student/user', tags=["学生端用户相关接口"])
 
 if __name__ == '__main__':
     uvicorn.run("main:app", port=8080, reload=True, log_level="debug")
