@@ -19,7 +19,7 @@ TORTOISE_ORM = {
     },
     "apps": {
         "models": {
-            "models": ["app.models", 'aerich.models'],  # models数据模型迁移
+            "models": ["app.models.models", 'aerich.models'],  # models数据模型迁移
             "default_connection": "default"
         }
     },

@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from app.config.authConfig import ADMIN_INCLUDE_PATHS, ADMIN_EXCLUDE_PATHS, USER_EXCLUDE_PATHS, USER_INCLUDE_PATHS
 from app.config.jwtConfig import SECRET_KEY, ALGORITHM
 from app.constant.jwtConstant import ADMIN_ID
-from app.result import Result
+from app.common.result import Result
 
 
 # 定义一个依赖，用于获取请求头中的 Authorization token

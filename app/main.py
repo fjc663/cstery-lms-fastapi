@@ -1,13 +1,11 @@
-import logging
-
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
 from starlette.responses import JSONResponse
 from tortoise.contrib.fastapi import register_tortoise
-from apis import user_api
+from apis.teacher import user_api
 from app.settings import TORTOISE_ORM
-from app.result import Result
-from app.middlewares import AuthMiddleware, get_token_header
+from app.common.result import Result
+from app.common.middlewares import AuthMiddleware, get_token_header
 
 app = FastAPI(dependencies=[Depends(get_token_header)])
 

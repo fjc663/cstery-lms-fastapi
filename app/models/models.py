@@ -1,13 +1,16 @@
 from tortoise.models import Model
 from tortoise import fields
 
+from app.common.enums import RoleEnum, GenderEnum
+
+
 class User(Model):
     id = fields.IntField(pk=True, description="用户的唯一标识符")
     username = fields.CharField(max_length=100, description="用户的用户名")
     password = fields.CharField(max_length=100, description="用户的密码")
     email = fields.CharField(max_length=100, null=True, description="用户的邮箱地址")
-    role = fields.IntField(choices=[(0, 'Student'), (1, 'Teacher')], description="用户角色: 0-学生, 1-教师")
-    gender = fields.IntField(choices=[(0, 'Female'), (1, 'Male')], description="用户性别: 0-女性, 1-男性")
+    role = fields.IntEnumField(RoleEnum, description="用户角色: 0-学生, 1-教师, 2-管理员")
+    gender = fields.IntEnumField(GenderEnum, description="用户性别: 0-女性, 1-男性, 2-保密")
     phone = fields.CharField(max_length=100, null=True, description="用户的联系电话")
     address = fields.CharField(max_length=100, null=True, description="用户的地址")
     desc = fields.TextField(description="用户的个人描述或介绍")
