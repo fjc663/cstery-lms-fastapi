@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from starlette.responses import JSONResponse
 from tortoise.contrib.fastapi import register_tortoise
 from apis import teacher_user_api, student_user_api
+from app.apis.student.studentClassApi import student_class_api
 from app.apis.teacher.teacherClassApi import teacher_class_api
 from app.settings import TORTOISE_ORM
 from app.common.result import Result
@@ -38,6 +39,7 @@ app.include_router(teacher_user_api, prefix='/teacher/user', tags=["教师端用
 app.include_router(teacher_class_api, prefix='/teacher/class', tags=["教师端班级相关接口"])
 
 app.include_router(student_user_api, prefix='/student/user', tags=["学生端用户相关接口"])
+app.include_router(student_class_api, prefix='/student/class', tags=["学生端班级相关接口"])
 
 if __name__ == '__main__':
     uvicorn.run("main:app", port=8080, reload=True, log_level="debug")

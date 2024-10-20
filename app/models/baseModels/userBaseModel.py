@@ -1,6 +1,9 @@
 from typing import Optional
 from pydantic import BaseModel, Field, EmailStr
+from fastapi import status
+
 from app.common.enums import GenderEnum
+from app.common.exceptions import UserException
 
 
 # 登录模型
@@ -16,11 +19,27 @@ class LoginModel(BaseModel):
             }
         }
 
+
 # 注册模型
 class RegisterModel(BaseModel):
-    username: Optional[str] = Field(None, description="用户名", min_length=1, max_length=20)
-    password: Optional[str] = Field(None, description="密码", min_length=6, max_length=18)
-    confirm_password: Optional[str] = Field(..., description="确认密码", min_length=6, max_length=18)
+    username: Optional[str] = Field(
+        ...,
+        description="用户名",
+        min_length=1,
+        max_length=20,
+    )
+    password: Optional[str] = Field(
+        ...,
+        description="密码",
+        min_length=6,
+        max_length=18,
+    )
+    confirm_password: Optional[str] = Field(
+        ...,
+        description="确认密码",
+        min_length=6,
+        max_length=18,
+    )
 
     class Config:
         json_schema_extra = {
@@ -30,6 +49,7 @@ class RegisterModel(BaseModel):
                 "confirm_password": "123456",
             }
         }
+
 
 # 用户信息模型
 class UserModel(BaseModel):
@@ -62,4 +82,3 @@ class UserModel(BaseModel):
 #     place: Optional[str] = None
 #     address: Optional[str] = None
 #     remark: Optional[str] = None
-

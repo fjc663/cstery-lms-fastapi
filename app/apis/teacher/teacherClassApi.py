@@ -25,10 +25,16 @@ async def update_class(class_model: ClassModel):
 @teacher_class_api.get("", summary="返回当前教师所创建的班级")
 async def get_class(request: Request):
     teacher_id = request.state.user_id
-    class_list = await classService.get_class(teacher_id)
+    class_list = await classService.get_class_by_teacher_id(teacher_id)
     return Result.success(class_list)
 
 @teacher_class_api.delete("", summary="删除班级")
 async def delete_class(class_id: int = Query(..., description="班级ID")):
     await classService.delete_class(class_id)
     return Result.success()
+
+
+@teacher_class_api.get("/stu/{class_id}", summary="获得班级学生信息")
+async def get_class_stu(class_id: int):
+    students = await classService.get_class_stu(class_id)
+    return Result.success(students)

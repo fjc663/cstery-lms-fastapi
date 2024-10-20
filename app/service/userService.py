@@ -1,13 +1,14 @@
 from fastapi import status
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
-from app.common.enums import RoleEnum
+from app.common.enums import RoleEnum, GenderEnum
 from app.models.baseModels.userBaseModel import UserModel, LoginModel, RegisterModel
 from app.constant.jwtConstant import TEACHER_ID, STUDENT_ID
 from app.utils import get_password_hash, verify_password, create_access_token
 from app.models.models import User
 from datetime import datetime
 from app.common.exceptions import UserException
+from app.utils.validUtil import validate_username_password
 
 
 # 用户登录
@@ -70,10 +71,14 @@ async def register(register_model: RegisterModel, role: RoleEnum):
         if confirm_password != user.get('password'):
             raise UserException(status_code=status.HTTP_400_BAD_REQUEST, detail="密码和确认密码不相同")
 
+    # 校验用户名和密码格式
+    validate_username_password(user['username'], user['password'])
+
     # 加密密码
     user['password'] = get_password_hash(user['password'])
 
     user["role"] = role.value
+    user["gender"] = GenderEnum.OTHER
     user["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     user["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     await User.create(**user)
@@ -81,8 +86,8 @@ async def register(register_model: RegisterModel, role: RoleEnum):
 
 # 请求当前用户信息
 async def get_user_info(current_user_id: int):
-    user = await User.get(id=current_user_id)
-    user.password = "******"
+    # 去除密码字段
+    user = await User.filter(id=current_user_id).exclude(password=True).first()
     return user
 
 
