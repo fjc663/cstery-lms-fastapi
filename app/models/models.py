@@ -4,6 +4,7 @@ from tortoise import fields
 from app.common.enums import RoleEnum, GenderEnum
 
 
+# 用户表
 class User(Model):
     id = fields.IntField(pk=True, description="用户的唯一标识符")
     username = fields.CharField(max_length=100, description="用户的用户名")
@@ -13,7 +14,7 @@ class User(Model):
     gender = fields.IntEnumField(GenderEnum, description="用户性别: 0-女性, 1-男性, 2-保密")
     phone = fields.CharField(max_length=100, null=True, description="用户的联系电话")
     address = fields.CharField(max_length=100, null=True, description="用户的地址")
-    desc = fields.TextField(description="用户的个人描述或介绍")
+    desc = fields.TextField(null=True, description="用户的个人描述或介绍")
     avatar = fields.CharField(max_length=100, null=True, description="用户头像的URL")
     created_at = fields.DatetimeField(auto_now_add=True, description="用户创建时间")
     updated_at = fields.DatetimeField(auto_now=True, description="用户最后更新时间")
@@ -21,18 +22,36 @@ class User(Model):
     class Meta:
         table = "user"
 
+
+# 班级表
 class Class(Model):
     id = fields.IntField(pk=True, description="班级的唯一标识符")
     class_name = fields.CharField(max_length=100, description="班级名称")
-    teacher = fields.ForeignKeyField("models.User", related_name="classes", on_delete=fields.CASCADE, description="班级对应的教师")
-    desc = fields.TextField(description="班级的详细描述")
+    class_code = fields.CharField(max_length=20, unique=True, description="班级邀请码")
+    teacher = fields.ForeignKeyField("models.User", related_name="classes", on_delete=fields.CASCADE,
+                                     description="班级对应的教师")
+    desc = fields.TextField(null=True, description="班级的详细描述")
     class_img = fields.CharField(max_length=100, null=True, description="班级图片的URL")
     created_at = fields.DatetimeField(auto_now_add=True, description="班级创建时间")
     updated_at = fields.DatetimeField(auto_now=True, description="班级最后更新时间")
+    is_deleted = fields.BooleanField(default=False, description="是否删除")
 
     class Meta:
         table = "class"
 
+
+# 班级学生关联表
+class ClassStudent(Model):
+    id = fields.IntField(pk=True, description="班级学生关系的唯一标识符")
+    clas = fields.ForeignKeyField("models.Class", related_name="students", on_delete=fields.CASCADE, description="班级")
+    student = fields.ForeignKeyField("models.User", related_name="student_classes", on_delete=fields.CASCADE, description="学生")
+    created_at = fields.DatetimeField(auto_now_add=True, description="学生加入时间")
+
+    class Meta:
+        table = "class_student"
+
+
+# 任务表
 class Assignment(Model):
     id = fields.IntField(pk=True, description="作业的唯一标识符")
     title = fields.CharField(max_length=200, description="作业标题")
@@ -47,10 +66,14 @@ class Assignment(Model):
     class Meta:
         table = "assignment"
 
+
+# 班级任务关联表
 class ClassAssignment(Model):
     id = fields.IntField(pk=True, description="班级作业关系的唯一标识符")
-    class_ = fields.ForeignKeyField("models.Class", related_name="assignments", on_delete=fields.CASCADE, description="班级")
-    assignment = fields.ForeignKeyField("models.Assignment", related_name="classes", on_delete=fields.CASCADE, description="作业")
+    clas = fields.ForeignKeyField("models.Class", related_name="assignments", on_delete=fields.CASCADE,
+                                  description="班级")
+    assignment = fields.ForeignKeyField("models.Assignment", related_name="class_assignments", on_delete=fields.CASCADE,
+                                        description="作业")
     assigned_at = fields.DatetimeField(auto_now_add=True, description="作业分配时间")
 
     class Meta:

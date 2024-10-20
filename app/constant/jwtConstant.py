@@ -1,2 +1,2 @@
-USER_ID = 'userId'
-ADMIN_ID = 'adminId'
+TEACHER_ID = 'teacherId'
+STUDENT_ID = 'studentId'

@@ -3,7 +3,7 @@ from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from app.common.enums import RoleEnum
 from app.models.baseModels.userBaseModel import UserModel, LoginModel, RegisterModel
-from app.constant.jwtConstant import ADMIN_ID
+from app.constant.jwtConstant import TEACHER_ID, STUDENT_ID
 from app.utils import get_password_hash, verify_password, create_access_token
 from app.models.models import User
 from datetime import datetime
@@ -40,7 +40,7 @@ async def login(login_model: LoginModel, role: RoleEnum):
         raise UserException(status_code=status.HTTP_401_UNAUTHORIZED, detail="密码错误")
 
     # 生成 JWT token
-    data = {ADMIN_ID: user.id}
+    data = {TEACHER_ID if user.role == RoleEnum.TEACHER else STUDENT_ID : user.id}
     token = create_access_token(data)
     return token
 
@@ -89,6 +89,7 @@ async def get_user_info(current_user_id: int):
 # 更新用户信息
 async def update(user_model: UserModel, user_id: int):
     user = user_model.model_dump(exclude_none=True)
+    user["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
         # 尝试更新用户信息

@@ -6,9 +6,9 @@ import fnmatch  # 用于路径匹配
 
 from starlette.responses import JSONResponse
 
-from app.config.authConfig import ADMIN_INCLUDE_PATHS, ADMIN_EXCLUDE_PATHS, USER_EXCLUDE_PATHS, USER_INCLUDE_PATHS
+from app.config.authConfig import TEACHER_INCLUDE_PATHS, TEACHER_EXCLUDE_PATHS, STUDENT_EXCLUDE_PATHS, STUDENT_INCLUDE_PATHS
 from app.config.jwtConfig import SECRET_KEY, ALGORITHM
-from app.constant.jwtConstant import ADMIN_ID
+from app.constant.jwtConstant import TEACHER_ID, STUDENT_ID
 from app.common.result import Result
 
 
@@ -21,15 +21,15 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
 
-        # 验证管理员路径
-        if self._is_protected_path(path, ADMIN_INCLUDE_PATHS, ADMIN_EXCLUDE_PATHS):
-            validation_response = await self._validate_token(request)
+        # 验证教师端路径
+        if self._is_protected_path(path, TEACHER_INCLUDE_PATHS, TEACHER_EXCLUDE_PATHS):
+            validation_response = await self._validate_token(request, TEACHER_ID)
             if validation_response:  # 如果有验证失败的响应，直接返回该响应
                 return validation_response
 
-        # 验证用户路径
-        if self._is_protected_path(path, USER_INCLUDE_PATHS, USER_EXCLUDE_PATHS):
-            validation_response = await self._validate_token(request)
+        # 验证学生端路径
+        if self._is_protected_path(path, STUDENT_INCLUDE_PATHS, STUDENT_EXCLUDE_PATHS):
+            validation_response = await self._validate_token(request, STUDENT_ID)
             if validation_response:  # 如果有验证失败的响应，直接返回该响应
                 return validation_response
 
@@ -51,7 +51,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         return False
 
     @staticmethod
-    async def _validate_token(request: Request):
+    async def _validate_token(request: Request, id_type: str):
         # 从请求中提取Token
         token = request.headers.get("token")
         if not token:
@@ -60,7 +60,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         try:
             # 验证Token并获取用户信息
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            user_id = payload.get(ADMIN_ID)
+            user_id = payload.get(id_type)
             if user_id is None:
                 return JSONResponse(content=Result.error(0, "无效Token").dict())
             request.state.user_id = user_id  # 将用户ID存储在请求状态中
