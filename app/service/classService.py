@@ -1,8 +1,6 @@
-from tortoise.contrib.pydantic import pydantic_model_creator
-
 from app.common.exceptions import ClassException
 from app.models.baseModels.classBaseModel import ClassModel
-from app.models.models import Class, ClassStudent, User
+from app.models.models import Class, ClassStudent
 from app.utils.classUtil import generate_class_code
 from datetime import datetime
 from tortoise.exceptions import DoesNotExist
@@ -68,9 +66,9 @@ async def join_class(student_id, class_code):
     except DoesNotExist:
         # 将学生加入班级
         await ClassStudent.create(
-            clas_id = clas.id,
-            student_id = student_id,
-            created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            clas_id=clas.id,
+            student_id=student_id,
+            created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         )
 
 
@@ -95,9 +93,6 @@ async def get_class_by_student_id(student_id):
 
 # 根据班级ID查询学生信息
 async def get_class_stu(class_id):
-    # 创建不包含密码字段用户模型
-    student_exclude_password = pydantic_model_creator(User, exclude=("password",))
-
     # 查询学生班级关联表
     class_student_list = await ClassStudent.filter(clas_id=class_id).prefetch_related("student")
 

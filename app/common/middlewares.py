@@ -1,7 +1,7 @@
 from fastapi import Request, Header
 from starlette.middleware.base import BaseHTTPMiddleware
 from jose import jwt
-from jwt.exceptions import PyJWTError, ExpiredSignatureError
+from jose.exceptions import ExpiredSignatureError, JOSEError
 import fnmatch  # 用于路径匹配
 
 from starlette.responses import JSONResponse
@@ -64,7 +64,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
             if user_id is None:
                 return JSONResponse(content=Result.error(0, "无效Token").dict())
             request.state.user_id = user_id  # 将用户ID存储在请求状态中
-        except (PyJWTError, ExpiredSignatureError):
+        except ExpiredSignatureError:
+            # 处理Token过期错误
+            return JSONResponse(content=Result.error(0, "Token已过期").dict())
+        except JOSEError:
+            # 处理其他JWT错误
             return JSONResponse(content=Result.error(0, "无效Token").dict())
 
         # 如果验证通过则返回 None，继续处理请求

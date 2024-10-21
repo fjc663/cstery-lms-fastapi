@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
 from starlette.responses import JSONResponse
+from starlette.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
 from apis import teacher_user_api, student_user_api
 from app.apis.student.studentClassApi import student_class_api
@@ -21,6 +22,10 @@ register_tortoise(
     config=TORTOISE_ORM
 )
 
+#挂载静态文件
+app.mount("/avatar", StaticFiles(directory="../static/avatar"))
+
+# 注册中间件
 app.add_middleware(AuthMiddleware)
 
 
