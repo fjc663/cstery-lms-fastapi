@@ -1,4 +1,4 @@
-from fastapi import Request, Header
+from fastapi import Request, Header, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JOSEError
@@ -13,7 +13,7 @@ from app.common.result import Result
 
 
 # 定义一个依赖，用于获取请求头中的 Authorization token
-async def get_token_header(token: str = Header(None)):
+async def get_token_header(token: str = Header(None, description='登录校验令牌')):
     return token
 
 
@@ -55,21 +55,21 @@ class AuthMiddleware(BaseHTTPMiddleware):
         # 从请求中提取Token
         token = request.headers.get("token")
         if not token:
-            return JSONResponse(content=Result.error(0, "未提供Token").dict())
+            return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=Result.error(0, "未提供Token").dict())
 
         try:
             # 验证Token并获取用户信息
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_id = payload.get(id_type)
             if user_id is None:
-                return JSONResponse(content=Result.error(0, "无效Token").dict())
+                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=Result.error(0, "无效Token").dict())
             request.state.user_id = user_id  # 将用户ID存储在请求状态中
         except ExpiredSignatureError:
             # 处理Token过期错误
-            return JSONResponse(content=Result.error(0, "Token已过期").dict())
+            return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=Result.error(0, "Token已过期").dict())
         except JOSEError:
             # 处理其他JWT错误
-            return JSONResponse(content=Result.error(0, "无效Token").dict())
+            return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=Result.error(0, "无效Token").dict())
 
         # 如果验证通过则返回 None，继续处理请求
         return None

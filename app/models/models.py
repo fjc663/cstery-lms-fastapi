@@ -49,10 +49,11 @@ class Class(Model):
     id = fields.IntField(pk=True, description="班级的唯一标识符")
     class_name = fields.CharField(max_length=100, description="班级名称")
     class_code = fields.CharField(max_length=20, unique=True, description="班级邀请码")
+    teacher_name = fields.CharField(max_length=100, null=True, description="老师名称")
     teacher = fields.ForeignKeyField("models.Teacher", related_name="classes", on_delete=fields.CASCADE,
                                      description="班级对应的教师")
     desc = fields.TextField(null=True, description="班级的详细描述")
-    class_img = fields.CharField(max_length=100, null=True, description="班级图片的URL")
+    class_img = fields.CharField(max_length=255, null=True, description="班级图片的URL")
     created_at = fields.DatetimeField(auto_now_add=True, description="班级创建时间")
     updated_at = fields.DatetimeField(auto_now=True, description="班级最后更新时间")
     is_deleted = fields.BooleanField(default=False, description="是否删除")

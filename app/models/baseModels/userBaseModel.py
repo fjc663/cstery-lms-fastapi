@@ -99,7 +99,25 @@ class StudentModel(BaseModel):
         }
 
 
-# 用户信息模型
+# 用户信息分页查询
+class StudentPageQueryModel(BaseModel):
+    page: int = Field(..., description="页码")
+    pageSize: int = Field(..., description="每页学生数")
+    name: Optional[str] = Field(None, description="姓名")
+    gender: Optional[int] = Field(None, description="性别")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "page": 1,
+                "pageSize": 10,
+                "name": "张三",
+                "gender": GenderEnum.MALE.value
+            }
+        }
+
+
+# 登录后后返回的用户信息模型
 class UserInfo:
     token: str
     avatar: str
@@ -109,16 +127,3 @@ class UserInfo:
         self.token = token
         self.avatar = avatar
         self.name = name
-
-
-
-# 用户信息分页查询
-# class UserPageQueryModel(BaseModel):
-#     page: int
-#     pageSize: int
-#     username: Optional[str] = None
-#     role: Optional[str] = None
-#     phone: Optional[str] = None
-#     place: Optional[str] = None
-#     address: Optional[str] = None
-#     remark: Optional[str] = None
