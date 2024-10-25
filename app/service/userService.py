@@ -25,12 +25,12 @@ async def login(login_model: LoginModel, model, token_id: str):
         user = await model.get(username=login_model.username)
     except DoesNotExist:
         # 如果用户不存在，抛出 404 错误
-        raise UserException(status_code=status.HTTP_404_NOT_FOUND, detail="用户不存在")
+        raise UserException(status_code=status.HTTP_200_OK, detail="用户不存在")
 
     # 验证密码
     if not verify_password(login_model.password, user.password):
         # 如果密码不匹配，抛出 401 错误
-        raise UserException(status_code=status.HTTP_401_UNAUTHORIZED, detail="密码错误")
+        raise UserException(status_code=status.HTTP_200_OK, detail="密码错误")
 
     # 生成 JWT token
     data = {token_id : user.id}
@@ -51,7 +51,7 @@ async def register(register_model: RegisterModel, model):
     # 判断用户名是否重复
     try:
         await model.get(username=register_model.username)
-        raise UserException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已存在")
+        raise UserException(status_code=status.HTTP_200_OK, detail="用户名已存在")
     except DoesNotExist:
         # 用户不存在，可以继续注册流程
         pass
@@ -62,7 +62,7 @@ async def register(register_model: RegisterModel, model):
     confirm_password = user.pop('confirm_password', None)
     if confirm_password:
         if confirm_password != user.get('password'):
-            raise UserException(status_code=status.HTTP_400_BAD_REQUEST, detail="密码和确认密码不相同")
+            raise UserException(status_code=status.HTTP_200_OK, detail="密码和确认密码不相同")
 
     # 校验用户名和密码格式
     validate_username_password(user['username'], user['password'])
@@ -97,7 +97,7 @@ async def update(base_model: Union[TeacherModel, StudentModel], model, user_id: 
 
     if updated_count == 0:
         # 如果没有找到用户，返回 404
-        raise UserException(status_code=status.HTTP_404_NOT_FOUND, detail="用户不存在")
+        raise UserException(status_code=status.HTTP_200_OK, detail="用户不存在")
 
 
 # # 分页查询用户信息

@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 class ClassModel(BaseModel):
     id: Optional[int] = Field(None, description="班级ID")
     class_name: Optional[str] = Field(..., min_length=1, max_length=100)
-    teacher_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    teacher_name: Optional[str] = Field(..., min_length=1, max_length=100)
     class_img: Optional[str] = Field(None)
     desc: Optional[str] = Field(None, description="班级描述信息")
 

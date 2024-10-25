@@ -43,10 +43,10 @@ async def get_class_stu(class_id: int, request: Request):
 
 
 @teacher_class_api.get("/{class_id}", summary="获得班级详细信息")
-async def get_class_by_id(class_id: int, request: Request):
-    teacher_id = request.state.user_id
-    clas = await classService.get_class_by_id(class_id, teacher_id)
+async def get_class_by_id(class_id: int):
+    clas = await classService.get_class_by_id(class_id)
     return Result.success(clas)
+
 
 @teacher_class_api.get("/stu/page/{class_id}", summary="分页查询班级学生信息")
 async def get_user_page(class_id: int, request: Request, page_query_model: StudentPageQueryModel = Query(..., description="分页查询条件")):

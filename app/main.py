@@ -4,10 +4,12 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
 from apis import teacher_user_api, student_user_api
+from app.apis.common.deleteFileApi import delete_file_api
 from app.apis.common.uploadFileApi import upload_file_api
 from app.apis.student.studentClassApi import student_class_api
+from app.apis.student.studentTaskApi import student_task_api
 from app.apis.teacher.teacherClassApi import teacher_class_api
-from app.common.exceptions import TeacherBaseException
+from app.common.exceptions import LmsBaseException
 from app.settings import TORTOISE_ORM
 from app.common.result import Result
 from app.common.middlewares import AuthMiddleware, get_token_header
@@ -41,7 +43,7 @@ async def other_exception_handler(_, __):
 
 
 # 捕获全局业务异常
-@app.exception_handler(TeacherBaseException)
+@app.exception_handler(LmsBaseException)
 async def service_exception_handler(_, ex: HTTPException):
     return JSONResponse(status_code=ex.status_code, content=Result.error(msg=ex.detail).dict())
 
@@ -51,8 +53,10 @@ app.include_router(teacher_class_api, prefix='/teacher/class', tags=["教师端�
 
 app.include_router(student_user_api, prefix='/student/user', tags=["学生端用户相关接口"])
 app.include_router(student_class_api, prefix='/student/class', tags=["学生端班级相关接口"])
+app.include_router(student_task_api, prefix='/student/task', tags=["学生端作业相关接口"])
 
 app.include_router(upload_file_api, prefix='/upload', tags=["文件上传相关接口"])
+app.include_router(delete_file_api, prefix='/delete', tags=["文件删除相关接口"])
 
 if __name__ == '__main__':
     uvicorn.run("main:app", port=8080, reload=True, log_level="debug")

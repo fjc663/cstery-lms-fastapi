@@ -6,6 +6,7 @@ from app.common.result import PageResult
 from app.models.baseModels.classBaseModel import ClassModel
 from app.models.baseModels.userBaseModel import StudentPageQueryModel
 from app.models.models import Class, ClassStudent, Teacher
+from app.service.taskService import get_task_by_class_id
 from app.utils.classUtil import generate_class_code
 from datetime import datetime
 from tortoise.exceptions import DoesNotExist
@@ -63,11 +64,11 @@ async def delete_class(class_id: int):
     try:
         clas: Class = await Class.get(id=class_id)
     except DoesNotExist:
-        raise ClassException(status_code=status.HTTP_404_NOT_FOUND, detail="班级不存在")
+        raise ClassException(status_code=status.HTTP_200_OK, detail="班级不存在")
 
     # 判断是否已删除
     if clas.is_deleted:
-        raise ClassException(status_code=status.HTTP_400_BAD_REQUEST, detail="班级已删除，请勿重复操作")
+        raise ClassException(status_code=status.HTTP_200_OK, detail="班级已删除，请勿重复操作")
 
     # 逻辑删除班级信息
     await Class.filter(id=class_id).update(is_deleted=True)
@@ -79,12 +80,12 @@ async def join_class(student_id, class_code):
     try:
         clas = await Class.get(class_code=class_code, is_deleted=False)
     except DoesNotExist:
-        raise ClassException(status_code=status.HTTP_404_NOT_FOUND, detail="班级不存在")
+        raise ClassException(status_code=status.HTTP_200_OK, detail="班级不存在")
 
     # 判断学生是否在班级
     try:
         await ClassStudent.get(clas_id=clas.id, student_id=student_id)
-        raise ClassException(status_code=status.HTTP_404_NOT_FOUND, detail="已加入班级，请勿重复操作")
+        raise ClassException(status_code=status.HTTP_200_OK, detail="已加入班级，请勿重复操作")
     except DoesNotExist:
         # 将学生加入班级
         await ClassStudent.create(
@@ -100,7 +101,7 @@ async def exit_class(student_id, class_code):
     try:
         clas = await Class.get(class_code=class_code, is_deleted=False)
     except DoesNotExist:
-        raise ClassException(status_code=status.HTTP_404_NOT_FOUND, detail="班级不存在")
+        raise ClassException(status_code=status.HTTP_200_OK, detail="班级不存在")
 
     await ClassStudent.filter(student_id=student_id, clas_id=clas.id).delete()
 
@@ -108,10 +109,19 @@ async def exit_class(student_id, class_code):
 # 查询已加入的班级
 async def get_class_by_student_id(student_id):
     # 查询学生班级关联表
-    class_student_list = await ClassStudent.filter(student_id=student_id).prefetch_related("clas")
+    class_student_list = await ClassStudent.filter(student_id=student_id).prefetch_related("clas").order_by('created_at')
+
+    classes = [class_student.clas for class_student in class_student_list]
+
+    # 为每个班级设置作业字段
+    new_classes = []
+    for clas in classes:
+        clas = vars(clas)
+        clas['tasks'] = await get_task_by_class_id(class_id=clas.get('id'), student_id=student_id)
+        new_classes.append(clas)
 
     # 返回班级对象列表
-    return [class_student.clas for class_student in class_student_list]
+    return new_classes
 
 
 # 根据班级ID查询学生信息
@@ -120,7 +130,7 @@ async def get_class_stu(class_id: int, teacher_id: int):
     try:
         await Class.get(id=class_id, teacher_id=teacher_id, is_deleted=False)
     except DoesNotExist:
-        raise ClassException(status_code=status.HTTP_404_NOT_FOUND, detail="班级不存在")
+        raise ClassException(status_code=status.HTTP_200_OK, detail="班级不存在")
 
     # 查询学生班级关联表
     class_student_list = await ClassStudent.filter(clas_id=class_id).prefetch_related("student")
@@ -137,18 +147,9 @@ async def get_class_stu(class_id: int, teacher_id: int):
 
 
 # 根据班级ID返回信息
-async def get_class_by_id(class_id, teacher_id):
-    # 根据班级ID和教师ID查询班级
-    clas = await Class.get(id=class_id, teacher_id=teacher_id, is_deleted=False)
-    # 查询当前教师信息
-    teacher = await Teacher.get(id=teacher_id)
-
-    # 去除 'teacher_id' 字段，添加 'teacher_name' 字段
-    clas = vars(clas)
-    clas.pop('teacher_id')
-    if not clas['teacher_name']:
-        teacher_name = teacher.name if teacher.name else teacher.username
-        clas['teacher_name'] = teacher_name
+async def get_class_by_id(class_id):
+    # 根据班级ID查询班级
+    clas = await Class.get(id=class_id, is_deleted=False)
 
     return clas
 
@@ -159,7 +160,7 @@ async def get_student_page(page_query_model: StudentPageQueryModel, class_id: in
     try:
         await Class.get(id=class_id, teacher_id=teacher_id, is_deleted=False)
     except DoesNotExist:
-        raise ClassException(status_code=status.HTTP_404_NOT_FOUND, detail="班级不存在")
+        raise ClassException(status_code=status.HTTP_200_OK, detail="班级不存在")
 
     # 查询该教师所有班级信息
     query = ClassStudent.filter(clas_id=class_id).prefetch_related("student")
@@ -173,7 +174,8 @@ async def get_student_page(page_query_model: StudentPageQueryModel, class_id: in
     # 数据总条数
     total = await query.count()
     # 查询
-    students = await query.offset((page_query_model.page - 1) * page_query_model.pageSize).limit(page_query_model.pageSize)
+    students = await query.offset((page_query_model.page - 1) * page_query_model.pageSize).limit(
+        page_query_model.pageSize)
 
     # 移除每个 student 对象中的 password 字段
     student_list = []
@@ -182,6 +184,25 @@ async def get_student_page(page_query_model: StudentPageQueryModel, class_id: in
         student_data.pop('password', None)  # 删除密码字段
         student_list.append(student_data)
 
-
     return PageResult(total=total, records=student_list)
 
+
+# 根据邀请码查询班级信息
+async def get_class_by_code(class_code):
+    try:
+        # 根据班级ID和教师ID查询班级
+        clas = await Class.get(class_code=class_code, is_deleted=False)
+    except DoesNotExist:
+        raise ClassException(status_code=status.HTTP_200_OK, detail="邀请码错误")
+
+    # 查询当前教师信息
+    teacher = await Teacher.get(id=clas.teacher_id)
+
+    # 去除 'teacher_id' 字段，添加 'teacher_name' 字段
+    clas = vars(clas)
+    clas.pop('teacher_id')
+    if not clas['teacher_name']:
+        teacher_name = teacher.name if teacher.name else teacher.username
+        clas['teacher_name'] = teacher_name
+
+    return clas
