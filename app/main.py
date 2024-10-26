@@ -9,6 +9,7 @@ from app.apis.common.uploadFileApi import upload_file_api
 from app.apis.student.studentClassApi import student_class_api
 from app.apis.student.studentTaskApi import student_task_api
 from app.apis.teacher.teacherClassApi import teacher_class_api
+from app.apis.teacher.teacherTaskApi import teacher_task_api
 from app.common.exceptions import LmsBaseException
 from app.settings import TORTOISE_ORM
 from app.common.result import Result
@@ -50,6 +51,7 @@ async def service_exception_handler(_, ex: HTTPException):
 
 app.include_router(teacher_user_api, prefix='/teacher/user', tags=["教师端用户相关接口"])
 app.include_router(teacher_class_api, prefix='/teacher/class', tags=["教师端班级相关接口"])
+app.include_router(teacher_task_api, prefix='/teacher/task', tags=["教师端作业相关接口"])
 
 app.include_router(student_user_api, prefix='/student/user', tags=["学生端用户相关接口"])
 app.include_router(student_class_api, prefix='/student/class', tags=["学生端班级相关接口"])

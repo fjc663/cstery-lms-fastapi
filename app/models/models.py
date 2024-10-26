@@ -1,7 +1,7 @@
 from tortoise.models import Model
 from tortoise import fields
 
-from app.common.enums import GenderEnum
+from app.common.enums import GenderEnum, FormatEnum
 
 
 # 教师表
@@ -32,7 +32,7 @@ class Student(Model):
     student_number = fields.CharField(max_length=100, null=True, description="学号")
     school = fields.CharField(max_length=100, null=True, description="学校名称")
     email = fields.CharField(max_length=100, null=True, description="学生的邮箱地址")
-    gender = fields.IntEnumField(GenderEnum, description="用户性别: 0-女性, 1-男性, 2-保密")
+    gender = fields.IntEnumField(GenderEnum, default=GenderEnum.OTHER, description="用户性别: 0-女性, 1-男性, 2-保密")
     phone = fields.CharField(max_length=100, null=True, description="学生的联系电话")
     address = fields.CharField(max_length=100, null=True, description="学生的地址")
     desc = fields.TextField(null=True, description="学生的个人描述或介绍")
@@ -84,7 +84,7 @@ class Assignment(Model):
     desc = fields.TextField(null=True, description="作业的题目描述")
     due_date = fields.DateField(null=True, description="作业截止日期")
     allow_late_submission = fields.BooleanField(default=False, description="是否允许截止后提交作业")
-    submission_format = fields.CharField(max_length=50, null=True, default="text", description="作业提交的格式")
+    submission_format = fields.CharEnumField(FormatEnum, null=True, default=FormatEnum.TEXT, description="作业提交的格式")
     images = fields.JSONField(null=True, description="作业题目图片的URL列表，以JSON格式存储")
     is_deleted = fields.BooleanField(default=False, description="是否删除")
     created_at = fields.DatetimeField(auto_now_add=True, description="作业创建时间")
@@ -100,6 +100,8 @@ class StudentAssignment(Model):
     title = fields.CharField(max_length=200, description="作业解答标题")
     desc = fields.TextField(null=True, description="作业的解答描述")
     images = fields.JSONField(null=True, description="作业解答图片的URL列表，以JSON格式存储")
+    score = fields.IntField(null=True, description="作业评分")
+    feedback = fields.TextField(null=True, description="教师反馈")
     student = fields.ForeignKeyField("models.Student", related_name="student_assignments", on_delete=fields.CASCADE,
                                      description="学生")
     assignment = fields.ForeignKeyField("models.Assignment", related_name="class_assignments", on_delete=fields.CASCADE,

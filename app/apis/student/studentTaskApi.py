@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 
 from app.common.result import Result
-from app.models.baseModels.taskBaseModel import TaskModel
+from app.models.baseModels.taskBaseModel import AnswerModel
 from app.service import taskService
 
 student_task_api = APIRouter()
@@ -29,14 +29,14 @@ async def get_answer_by_id(task_id: int, request: Request):
 
 
 @student_task_api.post("/{task_id}", summary="提交作业")
-async def submit_task(task_id: int, task_mode: TaskModel, request: Request):
+async def submit_answer(task_id: int, answer_mode: AnswerModel, request: Request):
     student_id = request.state.user_id
-    await taskService.submit_task(task_id, task_mode, student_id)
+    await taskService.submit_task(task_id, answer_mode, student_id)
     return Result.success()
 
 
 @student_task_api.put("/{task_id}", summary="修改作业")
-async def edit_task(task_id: int, task_mode: TaskModel, request: Request):
+async def edit_answer(task_id: int, answer_mode: AnswerModel, request: Request):
     student_id = request.state.user_id
-    await taskService.edit_task(task_id, task_mode, student_id)
+    await taskService.edit_answer(task_id, answer_mode, student_id)
     return Result.success()

@@ -8,9 +8,9 @@ from app.utils import uploadUtil
 delete_file_api = APIRouter()
 
 
-@delete_file_api.delete("/student/task", summary="作业图片删除")
+@delete_file_api.delete("/student/answer", summary="作业作答图片删除")
 async def task_image_delete(filenames: List[str] = Query(..., description='要删除图片的文件名')):
-    await rename_and_delete(filenames, "student/task")
+    await rename_and_delete(filenames, "student/answer")
     return Result.success()
 
 

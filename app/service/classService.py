@@ -5,7 +5,7 @@ from app.common.exceptions import ClassException
 from app.common.result import PageResult
 from app.models.baseModels.classBaseModel import ClassModel
 from app.models.baseModels.userBaseModel import StudentPageQueryModel
-from app.models.models import Class, ClassStudent, Teacher
+from app.models.models import Class, ClassStudent, Teacher, Assignment
 from app.service.taskService import get_task_by_class_id
 from app.utils.classUtil import generate_class_code
 from datetime import datetime
@@ -36,25 +36,28 @@ async def update_class(class_model: ClassModel):
     class_id = clas.pop('id')
 
     # 更新
-    await Class.filter(id=class_id).update(**clas)
+    count = await Class.filter(id=class_id).update(**clas)
+
+    # 判断是否修改失败
+    if count == 0:
+        raise ClassException(status_code=status.HTTP_200_OK, detail="修改失败，请稍后尝试")
 
 
 # 根据教师ID返回班级信息
 async def get_class_by_teacher_id(teacher_id: int):
     # 查询该教师所有班级信息
     classes = await Class.filter(teacher_id=teacher_id, is_deleted=False)
-    # 查询当前教师信息
-    teacher = await Teacher.get(id=teacher_id)
 
-    # 去除 'teacher_id' 字段，添加 'teacher_name' 字段
-    teacher_name = teacher.name if teacher.name else teacher.username
+    # 为每个班级设置作业字段
+    new_classes = []
     for clas in classes:
         clas = vars(clas)
         clas.pop('teacher_id')
-        if not clas['teacher_name']:
-            clas['teacher_name'] = teacher_name
+        clas['tasks'] = await Assignment.filter(clas_id=clas.get('id'), is_deleted=False)
+        new_classes.append(clas)
 
-    return classes
+    # 返回班级对象列表
+    return new_classes
 
 
 # 删除班级
@@ -117,6 +120,7 @@ async def get_class_by_student_id(student_id):
     new_classes = []
     for clas in classes:
         clas = vars(clas)
+        clas.pop('teacher_id')
         clas['tasks'] = await get_task_by_class_id(class_id=clas.get('id'), student_id=student_id)
         new_classes.append(clas)
 
