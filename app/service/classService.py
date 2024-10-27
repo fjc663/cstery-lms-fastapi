@@ -5,7 +5,7 @@ from app.common.exceptions import ClassException
 from app.common.result import PageResult
 from app.models.baseModels.classBaseModel import ClassModel
 from app.models.baseModels.userBaseModel import StudentPageQueryModel
-from app.models.models import Class, ClassStudent, Teacher, Assignment
+from app.models.models import Class, ClassStudent, Teacher, Assignment, Student
 from app.service.taskService import get_task_by_class_id
 from app.utils.classUtil import generate_class_code
 from datetime import datetime
@@ -80,6 +80,11 @@ async def delete_class(class_id: int):
 # 根据班级码加入班级
 @atomic()
 async def join_class(student_id, class_code):
+    # 加入班级前校验是否完善个人信息
+    student = await Student.get(id=student_id)
+    if not student.name:
+        raise ClassException(status_code=status.HTTP_200_OK, detail="请先完善个人信息")
+
     try:
         clas = await Class.get(class_code=class_code, is_deleted=False)
     except DoesNotExist:

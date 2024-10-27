@@ -52,8 +52,8 @@ class RegisterModel(BaseModel):
 
 # 教师信息模型
 class TeacherModel(BaseModel):
-    name: Optional[str] = Field(None, description="姓名")
-    email: Optional[EmailStr] = Field(None, description="邮箱地址")
+    name: Optional[str] = Field(..., min_length=1, max_length=100, description="姓名")
+    email: Optional[EmailStr] = Field(..., description="邮箱地址")
     gender: Optional[GenderEnum] = Field(GenderEnum.OTHER.value, description="性别")
     phone: Optional[str] = Field(None, description="手机号码", pattern=r'^\+?[1-9]\d{1,14}$')
     birthdate: Optional[datetime] = Field(None, description="出生日期")
@@ -76,10 +76,10 @@ class TeacherModel(BaseModel):
 
 # 学生信息模型
 class StudentModel(BaseModel):
-    name: Optional[str] = Field(None, description="姓名")
-    student_number: Optional[str] = Field(None, description="学号")
-    school: Optional[str] = Field(None, description="学校名")
-    email: Optional[EmailStr] = Field(None, description="邮箱地址")
+    name: Optional[str] = Field(..., min_length=1, max_length=100, description="姓名")
+    student_number: Optional[str] = Field(..., description="学号")
+    school: Optional[str] = Field(..., description="学校名称")
+    email: Optional[EmailStr] = Field(..., description="邮箱地址")
     gender: Optional[GenderEnum] = Field(GenderEnum.OTHER.value, description="性别")
     phone: Optional[str] = Field(None, description="手机号码", pattern=r'^\+?[1-9]\d{1,14}$')
     birthdate: Optional[datetime] = Field(None, description="出生日期")
