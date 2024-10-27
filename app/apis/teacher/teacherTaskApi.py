@@ -41,3 +41,9 @@ async def get_answer(student_id: int, task_id: int = Query(..., description="作
 async def correct_task(correct_model: CorrectModel):
     await taskService.correct_task(correct_model)
     return Result.success()
+
+
+@teacher_task_api.delete("", summary="根据作业ID删除作业")
+async def delete_task(task_id: int = Query(..., description="作业ID")):
+    await taskService.delete_task(task_id)
+    return Result.success()

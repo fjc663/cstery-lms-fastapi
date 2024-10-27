@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Any
 from pydantic import BaseModel, Field, EmailStr
 
@@ -49,12 +50,13 @@ class RegisterModel(BaseModel):
         }
 
 
-# 用户信息模型
+# 教师信息模型
 class TeacherModel(BaseModel):
     name: Optional[str] = Field(None, description="姓名")
     email: Optional[EmailStr] = Field(None, description="邮箱地址")
     gender: Optional[GenderEnum] = Field(GenderEnum.OTHER.value, description="性别")
     phone: Optional[str] = Field(None, description="手机号码", pattern=r'^\+?[1-9]\d{1,14}$')
+    birthdate: Optional[datetime] = Field(None, description="出生日期")
     address: Optional[str] = Field(None, description="住址")
     desc: Optional[str] = Field(None, description="用户描述信息")
 
@@ -72,7 +74,7 @@ class TeacherModel(BaseModel):
         }
 
 
-# 用户信息模型
+# 学生信息模型
 class StudentModel(BaseModel):
     name: Optional[str] = Field(None, description="姓名")
     student_number: Optional[str] = Field(None, description="学号")
@@ -80,6 +82,7 @@ class StudentModel(BaseModel):
     email: Optional[EmailStr] = Field(None, description="邮箱地址")
     gender: Optional[GenderEnum] = Field(GenderEnum.OTHER.value, description="性别")
     phone: Optional[str] = Field(None, description="手机号码", pattern=r'^\+?[1-9]\d{1,14}$')
+    birthdate: Optional[datetime] = Field(None, description="出生日期")
     address: Optional[str] = Field(None, description="住址")
     desc: Optional[str] = Field(None, description="用户描述信息")
 
@@ -99,7 +102,7 @@ class StudentModel(BaseModel):
         }
 
 
-# 用户信息分页查询
+# 学生信息分页查询
 class StudentPageQueryModel(BaseModel):
     page: int = Field(..., description="页码")
     pageSize: int = Field(..., description="每页学生数")
@@ -127,3 +130,34 @@ class UserInfo:
         self.token = token
         self.avatar = avatar
         self.name = name
+
+
+# 修改密码模型
+class EditPasswordModel(BaseModel):
+    old_password: Optional[str] = Field(
+        ...,
+        description="旧密码",
+        min_length=6,
+        max_length=18,
+    )
+    new_password: Optional[str] = Field(
+        ...,
+        description="新密码",
+        min_length=6,
+        max_length=18,
+    )
+    confirm_password: Optional[str] = Field(
+        ...,
+        description="确认密码",
+        min_length=6,
+        max_length=18,
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "old_password": "123456",
+                "new_password": "654321",
+                "confirm_password": "654321",
+            }
+        }

@@ -36,7 +36,7 @@ async def update_class(class_model: ClassModel):
     class_id = clas.pop('id')
 
     # 更新
-    count = await Class.filter(id=class_id).update(**clas)
+    count = await Class.filter(id=class_id, is_deleted=False).update(**clas)
 
     # 判断是否修改失败
     if count == 0:
@@ -65,7 +65,7 @@ async def get_class_by_teacher_id(teacher_id: int):
 async def delete_class(class_id: int):
     # 判断班级是否存在
     try:
-        clas: Class = await Class.get(id=class_id)
+        clas: Class = await Class.get(id=class_id, is_deleted=False)
     except DoesNotExist:
         raise ClassException(status_code=status.HTTP_200_OK, detail="班级不存在")
 

@@ -34,3 +34,13 @@ async def get_teacher_info(current_teacher_id: int):
 # 更新用户信息
 async def teacher_update(teacher_model: TeacherModel, teacher_id: int):
     await userService.update(base_model=teacher_model, model=Teacher, user_id=teacher_id)
+
+
+# 更新头像
+async def update_teacher_avatar(avatar: str, teacher_id: int):
+    await userService.update_avatar(model=Teacher, avatar=avatar, user_id=teacher_id)
+
+
+# 修改密码
+async def update_teacher_password(password_model, teacher_id):
+    await userService.update_password(model=Teacher, password_model=password_model, user_id=teacher_id)

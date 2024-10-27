@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 
 from app.service import teacherService
 from app.common.result import Result
-from app.models.baseModels.userBaseModel import TeacherModel, LoginModel, RegisterModel
+from app.models.baseModels.userBaseModel import TeacherModel, LoginModel, RegisterModel, EditPasswordModel
 
 teacher_user_api = APIRouter()
 
@@ -30,6 +30,13 @@ async def get_teacher_info(request: Request):
 async def update_teacher_info(user: TeacherModel, request: Request):
     current_teacher_id = request.state.user_id  # 从请求中获取用户ID
     await teacherService.teacher_update(user, current_teacher_id)
+    return Result.success()
+
+
+@teacher_user_api.put("/editPassword", summary="修改密码")
+async def update_teacher_password(password_model: EditPasswordModel, request: Request):
+    teacher_id = request.state.user_id  # 从请求中获取用户ID
+    await teacherService.update_teacher_password(password_model, teacher_id)
     return Result.success()
 
 #

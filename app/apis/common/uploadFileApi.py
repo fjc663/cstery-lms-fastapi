@@ -1,16 +1,22 @@
 import uuid
 
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Request
 
 from app.common.result import Result
+from app.service import teacherService
 from app.utils import uploadUtil
 
 upload_file_api = APIRouter()
 
 
 @upload_file_api.post("/teacher/avatar", summary="头像上传")
-async def avatar_upload(avatar_file: UploadFile = File(...)):
+async def avatar_upload(request: Request, avatar_file: UploadFile = File(...)):
     path = await rename_and_upload(avatar_file, "teacher/avatar")
+
+    teacher_id = request.state.user_id
+    # 更新数据库
+    await teacherService.update_teacher_avatar(avatar=path, teacher_id=teacher_id)
+
     return Result.success(path)
 
 

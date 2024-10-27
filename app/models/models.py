@@ -12,10 +12,11 @@ class Teacher(Model):
     name = fields.CharField(max_length=100, null=True, description="姓名")
     email = fields.CharField(max_length=100, null=True, description="教师的邮箱地址")
     gender = fields.IntEnumField(GenderEnum, description="用户性别: 0-女性, 1-男性, 2-保密")
-    phone = fields.CharField(max_length=100, null=True, description="教师的联系电话")
-    address = fields.CharField(max_length=100, null=True, description="教师的地址")
+    phone = fields.CharField(max_length=30, null=True, description="教师的联系电话")
+    address = fields.CharField(max_length=255, null=True, description="教师的地址")
     desc = fields.TextField(null=True, description="教师的个人描述或介绍")
-    avatar = fields.CharField(max_length=100, null=True, description="教师头像的URL")
+    avatar = fields.CharField(max_length=255, null=True, description="教师头像的URL")
+    birthdate = fields.DateField(null=True, description="出生日期")
     created_at = fields.DatetimeField(auto_now_add=True, description="创建时间")
     updated_at = fields.DatetimeField(auto_now=True, description="更新时间")
 
@@ -23,20 +24,21 @@ class Teacher(Model):
         table = "teacher"
 
 
-# 用户表
+# 学生表
 class Student(Model):
     id = fields.IntField(pk=True, description="主键ID")
     username = fields.CharField(max_length=100, description="用户名")
     password = fields.CharField(max_length=100, description="密码")
     name = fields.CharField(max_length=100, null=True, description="姓名")
     student_number = fields.CharField(max_length=100, null=True, description="学号")
-    school = fields.CharField(max_length=100, null=True, description="学校名称")
+    school = fields.CharField(max_length=255, null=True, description="学校名称")
     email = fields.CharField(max_length=100, null=True, description="学生的邮箱地址")
     gender = fields.IntEnumField(GenderEnum, default=GenderEnum.OTHER, description="用户性别: 0-女性, 1-男性, 2-保密")
     phone = fields.CharField(max_length=100, null=True, description="学生的联系电话")
-    address = fields.CharField(max_length=100, null=True, description="学生的地址")
+    address = fields.CharField(max_length=255, null=True, description="学生的地址")
     desc = fields.TextField(null=True, description="学生的个人描述或介绍")
-    avatar = fields.CharField(max_length=100, null=True, description="学生头像的URL")
+    avatar = fields.CharField(max_length=255, null=True, description="学生头像的URL")
+    birthdate = fields.DateField(null=True, description="出生日期")
     created_at = fields.DatetimeField(auto_now_add=True, description="创建时间")
     updated_at = fields.DatetimeField(auto_now=True, description="更新时间")
 

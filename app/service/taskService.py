@@ -49,7 +49,7 @@ async def get_task_by_class_id(class_id, student_id: int):
 async def get_task_by_id(task_id: int, student_id: Optional[int] = None):
     try:
         # 查询作业信息
-        task = await Assignment.get(id=task_id)
+        task = await Assignment.get(id=task_id, is_deleted=False)
 
         if student_id:
             # 查询学生作业关联表
@@ -91,7 +91,7 @@ async def submit_task(task_id: int, answer_model: AnswerModel, student_id: int):
 
     # 校验作业是否存在
     try:
-        task = await Assignment.get(id=task_id)
+        task = await Assignment.get(id=task_id, is_deleted=False)
 
         # 判断是否到截止时间和不允许提交
         if task.due_date and datetime.now() > datetime.combine(task.due_date,
@@ -122,7 +122,7 @@ async def edit_answer(task_id: int, answer_model: AnswerModel, student_id: int):
 
     # 校验作业是否存在
     try:
-        task = await Assignment.get(id=task_id)
+        task = await Assignment.get(id=task_id, is_deleted=False)
 
         # 判断是否到截止时间和不允许修改
         if task.due_date and datetime.now() > datetime.combine(task.due_date,
@@ -168,7 +168,7 @@ async def create_task(task_mode: TaskModel):
 async def get_task_completion(task_id: int):
     try:
         # 根据作业ID查询作业
-        task = await Assignment.get(id=task_id)
+        task = await Assignment.get(id=task_id, is_deleted=False)
 
         # 根据班级id查询学生
         class_student_list = await ClassStudent.filter(clas_id=task.clas_id).prefetch_related("student")
@@ -187,6 +187,7 @@ async def get_task_completion(task_id: int):
             student['submitted_at'] = student_assignment.created_at
             student['edited_at'] = student_assignment.updated_at
             student['is_correct'] = True if student_assignment.score else False
+            student['score'] = student_assignment.score if student_assignment.score else None
 
             completion_status['submitted'].append(student)
 
@@ -216,20 +217,11 @@ async def edit_task(task_mode: TaskModel):
     task_id = task_mode.pop('id')
 
     # 更新
-    count = await Assignment.filter(id=task_id).update(**task_mode)
+    count = await Assignment.filter(id=task_id, is_deleted=False).update(**task_mode)
 
     # 判断是否更新失败
     if count == 0:
         raise TaskException(status_code=status.HTTP_200_OK, detail="修改失败，请稍后尝试")
-
-
-# 校验数据
-def valid_data(task_mode: TaskModel):
-    if task_mode.title is None or len(task_mode.title) == 0:
-        raise TaskException(status_code=status.HTTP_200_OK, detail="请设置标题")
-    if (task_mode.desc is None or len(task_mode.desc) == 0) and (
-            task_mode.images is None or len(task_mode.images) == 0):
-        raise TaskException(status_code=status.HTTP_200_OK, detail="请设置答题要求")
 
 
 # 根据学生ID和作业ID返回作答信息
@@ -264,3 +256,28 @@ async def correct_task(correct_model: CorrectModel):
 
     except:
         raise TaskException(status_code=status.HTTP_200_OK, detail="作答不存在")
+
+
+# 校验数据
+def valid_data(task_mode: TaskModel):
+    if task_mode.title is None or len(task_mode.title) == 0:
+        raise TaskException(status_code=status.HTTP_200_OK, detail="请设置标题")
+    if (task_mode.desc is None or len(task_mode.desc) == 0) and (
+            task_mode.images is None or len(task_mode.images) == 0):
+        raise TaskException(status_code=status.HTTP_200_OK, detail="请设置答题要求")
+
+
+# 根据作业ID删除作业
+async def delete_task(task_id: int):
+    # 判断作业是否存在
+    try:
+        task = await Assignment.get(id=task_id, is_deleted=False)
+    except DoesNotExist:
+        raise TaskException(status_code=status.HTTP_200_OK, detail="作业不存在")
+
+    # 判断是否已删除
+    if task.is_deleted:
+        raise TaskException(status_code=status.HTTP_200_OK, detail="作业已删除，请勿重复操作")
+
+    # 逻辑删除作业信息
+    await Assignment.filter(id=task_id).update(is_deleted=True)
