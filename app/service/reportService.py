@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from app.common.result import PageResult
 from app.models.baseModels.taskBaseModel import TaskPageQueryModel
-from app.models.models import Class, Assignment
+from app.models.models import Class, Assignment, ClassStudent, StudentAssignment
 from app.service.taskService import get_task_completion
 
 
@@ -50,8 +50,8 @@ async def get_all_task(teacher_id: int, page_query_model: TaskPageQueryModel):
         task['completion_rate'] = task['completed_count'] / task['total_count'] if task['completed_count'] else 0
 
         # 设置平均分字段
-        correct_count = 0 # 已批改数量
-        score = 0 # 全部分数之和
+        correct_count = 0  # 已批改数量
+        score = 0  # 全部分数之和
         for correct in completion_status['submitted']:
             if correct['score']:
                 correct_count += 1
@@ -78,12 +78,12 @@ async def get_task_report(task_id):
     task['not_completed_count'] = len(completion_status['not_submitted'])
 
     # 设置平均分、及格率字段、各分数段人数
-    correct_count = 0 # 已批改数量
-    score = 0 # 全部分数之和
-    gt60_count = 0 # 及格人数
+    correct_count = 0  # 已批改数量
+    score = 0  # 全部分数之和
+    gt60_count = 0  # 及格人数
     score_list = [0 for _ in range(5)]
     for correct in completion_status['submitted']:
-        if correct['score']:
+        if correct['score'] is not None:
             correct_count += 1
             score += correct['score']
             if correct['score'] >= 60:
@@ -109,3 +109,86 @@ async def get_task_report(task_id):
     task['score_list'] = score_list
 
     return task
+
+
+# 学生端分页查询作业情况
+async def student_page_query_task(student_id, page_query_model):
+    # 根据学生ID查询所有提交的作业
+    query = StudentAssignment.filter(student_id=student_id, assignment__is_deleted=False).prefetch_related('assignment')
+
+    # 根据分页条件筛选
+    if page_query_model.task_title:
+        query = query.filter(assignment__title__icontains=page_query_model.task_title)
+    if page_query_model.class_name:
+        query = query.filter(assignment__clas__class_name__icontains=page_query_model.class_name)
+    if page_query_model.is_cut_off is not None:
+        if page_query_model.is_cut_off:
+            query = query.filter(assignment__due_date__lt=datetime.now() - timedelta(days=1))
+        else:
+            query = query.filter(assignment__due_date__gt=datetime.now() - timedelta(days=1))
+
+    # 数据总条数
+    total = await query.count()
+    # 查询
+    answers = await query.offset((page_query_model.page - 1) * page_query_model.pageSize).limit(
+        page_query_model.pageSize)
+
+    # 设返回信息
+    task_reports = []
+    for answer in answers:
+        task_report = {}
+
+        task_report['task_id'] = answer.assignment_id
+        task_report['task_title'] = answer.assignment.title
+        clas = await answer.assignment.clas
+        task_report['class_name'] = clas.class_name
+        task_report['due_date'] = answer.assignment.due_date
+        task_report['score'] = answer.score
+
+        task_reports.append(task_report)
+
+    return PageResult(total=total, records=task_reports)
+
+
+# 返回学生作业完成情况的图表数据
+async def get_chart_data(student_id):
+    # 根据学生ID查询所有提交的作业
+    student_assignments = await StudentAssignment.filter(student_id=student_id, assignment__is_deleted=False)
+
+    # 提取分数列表
+    score_list = [0 for _ in range(5)]
+    for student_assignment in student_assignments:
+        if student_assignment.score is not None:
+            # 各分数段统计
+            if 0 <= student_assignment.score < 60:
+                score_list[0] += 1
+            elif 60 <= student_assignment.score < 70:
+                score_list[1] += 1
+            elif 70 <= student_assignment.score < 80:
+                score_list[2] += 1
+            elif 80 <= student_assignment.score < 90:
+                score_list[3] += 1
+            elif 90 <= student_assignment.score <= 100:
+                score_list[4] += 1
+
+    # 完成的作业数
+    completion_count = len(student_assignments)
+
+    # 获得加入的班级ids
+    class_students = await ClassStudent.filter(student_id=student_id, clas__is_deleted=False)
+    class_ids = [class_student.clas_id for class_student in class_students]
+
+    # 查询所有作业数
+    tasks = await Assignment.filter(clas_id__in=class_ids, is_deleted=False)
+
+    # 未完成的作业数
+    not_completion_count = len(tasks)
+
+    # 图表数据
+    chart_data = {
+        'completion_count': completion_count,
+        'not_completion_count': not_completion_count,
+        'score_list': score_list
+    }
+
+    return chart_data

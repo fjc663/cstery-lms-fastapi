@@ -7,6 +7,7 @@ from apis import teacher_user_api, student_user_api
 from app.apis.common.deleteFileApi import delete_file_api
 from app.apis.common.uploadFileApi import upload_file_api
 from app.apis.student.studentClassApi import student_class_api
+from app.apis.student.studentReportApi import student_report_api
 from app.apis.student.studentTaskApi import student_task_api
 from app.apis.teacher.teacherClassApi import teacher_class_api
 from app.apis.teacher.teacherReportApi import teacher_report_api
@@ -58,6 +59,7 @@ app.include_router(teacher_report_api, prefix='/teacher/report', tags=["教师�
 app.include_router(student_user_api, prefix='/student/user', tags=["学生端用户相关接口"])
 app.include_router(student_class_api, prefix='/student/class', tags=["学生端班级相关接口"])
 app.include_router(student_task_api, prefix='/student/task', tags=["学生端作业相关接口"])
+app.include_router(student_report_api, prefix='/student/report', tags=["学生端成绩报告相关接口"])
 
 app.include_router(upload_file_api, prefix='/upload', tags=["文件上传相关接口"])
 app.include_router(delete_file_api, prefix='/delete', tags=["文件删除相关接口"])

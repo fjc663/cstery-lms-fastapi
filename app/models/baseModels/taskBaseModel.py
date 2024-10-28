@@ -73,10 +73,10 @@ class CorrectModel(BaseModel):
         }
 
 
-# 学生信息分页查询
+# 作业信息分页查询
 class TaskPageQueryModel(BaseModel):
     page: int = Field(..., description="页码")
-    pageSize: int = Field(..., description="每页学生数")
+    pageSize: int = Field(..., description="每页作业数")
     task_title: Optional[str] = Field(None, description="作业标题")
     class_name: Optional[str] = Field(None, description="班级名称")
     is_cut_off: Optional[bool] = Field(None, description="是否截止")
