@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from app.common.result import PageResult
 from app.models.baseModels.taskBaseModel import TaskPageQueryModel
-from app.models.models import Class, Assignment, ClassStudent, StudentAssignment
+from app.models.models import Class, Assignment, ClassStudent, StudentAssignment, HomeImage
 from app.service.taskService import get_task_completion
 
 
@@ -192,3 +192,10 @@ async def get_chart_data(student_id):
     }
 
     return chart_data
+
+
+# 返回首页图片
+async def get_home_image(is_stu: bool):
+    images = await HomeImage.filter(is_stu=is_stu)
+
+    return images

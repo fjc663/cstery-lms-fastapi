@@ -14,3 +14,9 @@ class GenderEnum(IntEnum):
 class FormatEnum(StrEnum):
     TEXT = 'text'
     IMG = 'img'
+
+# 图片类型
+class ImageTypeEnum(IntEnum):
+    CAROUSEL = 0
+    PROMOTION = 1
+

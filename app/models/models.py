@@ -1,7 +1,7 @@
 from tortoise.models import Model
 from tortoise import fields
 
-from app.common.enums import GenderEnum, FormatEnum
+from app.common.enums import GenderEnum, FormatEnum, ImageTypeEnum
 
 
 # 教师表
@@ -113,3 +113,15 @@ class StudentAssignment(Model):
 
     class Meta:
         table = "student_assignment"
+
+# 首页图片表
+class HomeImage(Model):
+    id = fields.IntField(pk=True, description="主键ID")
+    url = fields.CharField(max_length=255, description="首页图片的url")
+    type = fields.IntEnumField(ImageTypeEnum, default=ImageTypeEnum.CAROUSEL, description="图片的类型")
+    is_stu = fields.BooleanField(default=False, description="是否是学生端的图片")
+    created_at = fields.DatetimeField(auto_now_add=True, description="创建时间")
+    updated_at = fields.DatetimeField(auto_add=True, description="更新时间")
+
+    class Meta:
+        table = "home_image"

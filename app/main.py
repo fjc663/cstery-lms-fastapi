@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Depends, status
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
-from apis import teacher_user_api, student_user_api
+from app.apis import teacher_user_api, student_user_api
 from app.apis.common.deleteFileApi import delete_file_api
 from app.apis.common.uploadFileApi import upload_file_api
 from app.apis.student.studentClassApi import student_class_api

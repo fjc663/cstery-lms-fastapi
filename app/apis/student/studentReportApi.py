@@ -18,3 +18,9 @@ async def get_chart_data(request: Request):
     student_id = request.state.user_id
     chart_data = await reportService.get_chart_data(student_id=student_id)
     return Result.success(chart_data)
+
+
+@student_report_api.get('/home/images', summary='返回首页图片')
+async def get_home_image():
+    images = await reportService.get_home_image(is_stu=True)
+    return Result.success(images)

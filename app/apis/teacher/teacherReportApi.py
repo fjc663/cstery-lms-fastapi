@@ -17,3 +17,8 @@ async def get_all_task(request: Request, page_query_model: TaskPageQueryModel = 
 async def get_task_report(task_id: int):
     task_report = await reportService.get_task_report(task_id=task_id)
     return Result.success(task_report)
+
+@teacher_report_api.get('/home/images', summary='返回首页图片')
+async def get_home_image():
+    images = await reportService.get_home_image(is_stu=False)
+    return Result.success(images)

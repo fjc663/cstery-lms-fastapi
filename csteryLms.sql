@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.12, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: lms_db
+-- Host: 192.168.88.156    Database: lms_db
 -- ------------------------------------------------------
 -- Server version	8.0.12
 
@@ -14,6 +14,10 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+DROP DATABASE IF EXISTS `lms_db`;
+create database `lms_db` character set utf8mb4 collate utf8mb4_general_ci;
+use lms_db;
 
 --
 -- Table structure for table `aerich`
@@ -97,7 +101,7 @@ CREATE TABLE `class` (
   UNIQUE KEY `class_code` (`class_code`),
   UNIQUE KEY `uid_class_class_c_02afb4` (`class_code`),
   KEY `fk_class_user_bcaf4a5a` (`teacher_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -106,7 +110,7 @@ CREATE TABLE `class` (
 
 LOCK TABLES `class` WRITE;
 /*!40000 ALTER TABLE `class` DISABLE KEYS */;
-INSERT INTO `class` VALUES (1,'2024秋季软件工程','51898a5b','http://127.0.0.1:8080/class/rjgc.png',1,'学习软件开发和测试流程',0,'2024-10-19 21:05:27.000000','2024-10-28 23:32:58.496113','李老师'),(3,'2022级数据结构','c3153d94','http://127.0.0.1:8080/class/sjjg.png',1,'学习二叉树，B树，B+树...',0,'2024-10-20 17:37:43.000000','2024-10-28 23:32:58.488642','王老师'),(4,'数据库','3c27efc7','http://127.0.0.1:8080/class/sjk.png',1,'学习Mysql、Nosql',0,'2024-10-20 20:04:52.000000','2024-10-28 23:32:58.478561','黄老师'),(5,'线性代数','e01c9d0c','http://127.0.0.1:8080/class/xxds.png',1,'向量学习',0,'2024-10-20 20:05:13.000000','2024-10-28 23:32:58.505069','小明老师'),(8,'高等数学','100d4d6b','http://127.0.0.1:8080/class/gdsx.png',1,'学习导数',1,'2024-10-22 17:26:31.000000','2024-10-28 23:32:58.463788','大明老师'),(9,'大学英语','527c4974','http://127.0.0.1:8080/class/dxyy.png',1,'Hello World',0,'2024-10-22 20:32:09.000000','2024-10-28 23:32:58.522806','小冯老师'),(10,'劳动教育','161b66ca','https://cstery-sky.oss-cn-beijing.aliyuncs.com/class/teacher/c53bbaed-4e30-4105-8828-131c8385951e.png',1,'劳动',1,'2024-10-22 23:21:15.000000','2024-10-23 23:30:28.081348','钱老师'),(13,'云计算','6844c5a5','http://127.0.0.1:8080/class/yjs.png',1,'学习云计算技术',0,'2024-10-23 00:40:46.000000','2024-10-28 23:32:58.513985','赵老师'),(15,'电工学','c5b51d17','https://cstery-sky.oss-cn-beijing.aliyuncs.com/teacher/class/f89ee4e1-5392-4f11-9e58-83c2687b6789.png',1,'学习电工知识',0,'2024-10-29 13:48:26.000000','2024-10-29 13:48:26.535564','赵老师');
+INSERT INTO `class` VALUES (1,'2024秋季软件工程','51898a5b','http://127.0.0.1:8080/class/rjgc.png',1,'学习软件开发和测试流程',0,'2024-10-19 21:05:27.000000','2024-10-28 23:32:58.496113','李老师'),(3,'2022级数据结构','c3153d94','http://127.0.0.1:8080/class/sjjg.png',1,'学习二叉树，B树，B+树...',0,'2024-10-20 17:37:43.000000','2024-10-28 23:32:58.488642','王老师'),(4,'数据库','3c27efc7','http://127.0.0.1:8080/class/sjk.png',1,'学习Mysql、Nosql',0,'2024-10-20 20:04:52.000000','2024-10-28 23:32:58.478561','黄老师'),(5,'线性代数','e01c9d0c','http://127.0.0.1:8080/class/xxds.png',1,'向量学习',0,'2024-10-20 20:05:13.000000','2024-10-28 23:32:58.505069','小明老师'),(8,'高等数学','100d4d6b','http://127.0.0.1:8080/class/gdsx.png',1,'学习导数',1,'2024-10-22 17:26:31.000000','2024-10-28 23:32:58.463788','大明老师'),(9,'大学英语','527c4974','http://127.0.0.1:8080/class/dxyy.png',1,'Hello World',0,'2024-10-22 20:32:09.000000','2024-10-28 23:32:58.522806','小冯老师'),(10,'劳动教育','161b66ca','https://cstery-sky.oss-cn-beijing.aliyuncs.com/class/teacher/c53bbaed-4e30-4105-8828-131c8385951e.png',1,'劳动',1,'2024-10-22 23:21:15.000000','2024-10-23 23:30:28.081348','钱老师'),(13,'云计算','6844c5a5','http://127.0.0.1:8080/class/yjs.png',1,'学习云计算技术',0,'2024-10-23 00:40:46.000000','2024-10-28 23:32:58.513985','赵老师'),(15,'电工学','c5b51d17','https://cstery-sky.oss-cn-beijing.aliyuncs.com/teacher/class/f89ee4e1-5392-4f11-9e58-83c2687b6789.png',1,'学习电工知识',0,'2024-10-29 13:48:26.000000','2024-10-29 13:48:26.535564','赵老师'),(16,'2024机器学习','6aadf431','https://cstery-sky.oss-cn-beijing.aliyuncs.com/teacher/class/55a5abd1-4352-4100-8730-3117a8841f69.png',1,'BP算法，卷积',0,'2024-10-30 04:34:05.000000','2024-10-30 12:34:05.602399','汪老师');
 /*!40000 ALTER TABLE `class` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -136,6 +140,34 @@ LOCK TABLES `class_student` WRITE;
 /*!40000 ALTER TABLE `class_student` DISABLE KEYS */;
 INSERT INTO `class_student` VALUES (2,1,2,'2024-10-20 20:13:16.446402'),(3,1,4,'2024-10-20 20:13:16.456666'),(4,1,3,'2024-10-20 20:13:16.462502'),(5,1,5,'2024-10-20 20:13:16.467981'),(6,1,7,'2024-10-20 20:13:16.473902'),(7,3,2,'2024-10-20 20:13:16.479164'),(8,3,4,'2024-10-20 20:13:16.485093'),(9,3,3,'2024-10-20 20:13:16.490232'),(10,3,5,'2024-10-20 20:13:16.496022'),(11,3,6,'2024-10-20 20:13:16.501971'),(12,3,7,'2024-10-20 20:13:16.507381'),(13,4,2,'2024-10-20 20:13:16.512606'),(14,4,4,'2024-10-20 20:13:16.519776'),(15,4,3,'2024-10-20 20:13:16.525606'),(16,4,5,'2024-10-20 20:13:16.531612'),(17,4,6,'2024-10-20 20:13:16.536925'),(18,5,2,'2024-10-20 20:13:16.542000'),(19,5,4,'2024-10-20 20:13:16.547295'),(20,5,3,'2024-10-20 20:13:16.552450'),(21,5,5,'2024-10-20 20:13:16.557313'),(22,5,6,'2024-10-20 20:13:16.562762'),(24,13,2,'2024-10-24 09:36:17.000000'),(25,1,9,'2024-10-27 11:17:57.000000'),(26,9,9,'2024-10-27 11:18:17.000000');
 /*!40000 ALTER TABLE `class_student` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `home_image`
+--
+
+DROP TABLE IF EXISTS `home_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `home_image` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `url` varchar(255) NOT NULL COMMENT '首页图片的url',
+  `type` smallint(6) NOT NULL DEFAULT '0' COMMENT '图片的类型',
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` datetime(6) NOT NULL COMMENT '更新时间',
+  `is_stu` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否是学生端的图片',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `home_image`
+--
+
+LOCK TABLES `home_image` WRITE;
+/*!40000 ALTER TABLE `home_image` DISABLE KEYS */;
+INSERT INTO `home_image` VALUES (1,'http://192.168.88.156:8080/imgs/lunbotu/stu1.png',0,'2024-10-30 19:27:45.000000','2024-10-30 19:27:48.000000',1),(2,'http://192.168.88.156:8080/imgs/lunbotu/stu2.png',0,'2024-10-30 19:28:33.000000','2024-10-30 19:28:35.000000',1),(3,'http://192.168.88.156:8080/imgs/lunbotu/stu3.png',0,'2024-10-30 19:29:21.000000','2024-10-30 19:29:25.000000',1),(4,'http://192.168.88.156:8080/imgs/lunbotu/stu4.png',0,'2024-10-30 19:29:22.000000','2024-10-30 19:29:25.000000',1),(5,'http://192.168.88.156:8080/imgs/lunbotu/stu5.png',1,'2024-10-30 19:29:23.000000','2024-10-30 19:29:26.000000',1),(6,'http://192.168.88.156:8080/imgs/lunbotu/stu6.png',1,'2024-10-30 19:29:24.000000','2024-10-30 19:29:27.000000',1),(7,'http://192.168.88.156:8080/imgs/lunbotu/tea1.png',0,'2024-10-30 19:30:33.000000','2024-10-30 19:30:34.000000',0),(8,'http://192.168.88.156:8080/imgs/lunbotu/tea2.png',0,'2024-10-30 19:30:35.000000','2024-10-30 19:30:37.000000',0),(9,'http://192.168.88.156:8080/imgs/lunbotu/tea3.png',0,'2024-10-30 19:30:35.000000','2024-10-30 19:30:37.000000',0),(10,'http://192.168.88.156:8080/imgs/lunbotu/tea4.png',0,'2024-10-30 19:30:36.000000','2024-10-30 19:30:38.000000',0),(11,'http://192.168.88.156:8080/imgs/lunbotu/tea5.png',1,'2024-10-30 19:30:39.000000','2024-10-30 19:30:41.000000',0),(12,'http://192.168.88.156:8080/imgs/lunbotu/tea6.png',1,'2024-10-30 19:30:39.000000','2024-10-30 19:30:40.000000',0);
+/*!40000 ALTER TABLE `home_image` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -253,4 +285,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-29 15:01:08
+-- Dump completed on 2024-10-30 20:13:49
