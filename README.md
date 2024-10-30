@@ -31,4 +31,27 @@
 教师端：[https://github.com/fjc663/cstery-lms](https://github.com/fjc663/cstery-lms)
 学生端：[https://github.com/fjc663/cstery-lms-stu](https://github.com/fjc663/cstery-lms-stu)
 
+### 完整项目的docker compose
+
+```
+docker-cstery-lms/
+├── fastapi-lms/
+│   ├── cstery-lms/ (即当前项目源代码，复制到该目录即可)   
+│   └──Dockerfile
+├── mysql-lms/
+│   ├── conf/
+│   │   └──lms.cnf
+│   ├── data/
+│   └── init/
+│       └── csteryLms.sql (复制该项目下的csteryLms.sql过来即可)
+├── nginx-lms/
+│   ├── html/
+│   │   ├── lms-stu/ (将学生端打包完的dist目录下所有文件拷贝过来即可)
+│   │   └── lms-tea/ (将教师端打包完的dist目录下所有文件拷贝过来即可)
+│   └── nginx.conf
+│
+└── docker-compose.yml
+```
+
+
 
